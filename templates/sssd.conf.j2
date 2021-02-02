@@ -19,9 +19,7 @@ reconnection_retries = {{ linux_ad_auth_sssd_reconnection_retries }}
 [domain/{{ linux_ad_auth_sssd_domain }}]
 description = LDAP domain with AD servers
 ad_domain = {{ linux_ad_auth_sssd_ad_domain }}
-{% if inventory_hostname != ansible_facts.hostname %}
-ad_hostname = {{ inventory_hostname }}
-{% endif %}
+ad_hostname = {{ ansible_facts.hostname }}
 ad_gpo_ignore_unreadable = {{ (linux_ad_auth_sssd_ad_gpo_ignore_unreadable) | ternary("True", "False") }}
 id_provider = {{ linux_ad_auth_sssd_id_provider }}
 auth_provider = {{ linux_ad_auth_sssd_auth_provider }}

@@ -3,7 +3,7 @@
 
 - block:
     # Create computer account to ensure long name is used
-    - include_tasks: computer.yml
+    #- include_tasks: computer.yml
     - include_tasks: wait.yml
 
     # Join to the realm
