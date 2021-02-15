@@ -1,20 +1,41 @@
 {{ ansible_managed | comment }}
 
+[domain/default]
+debug_level = {{ linux_ad_auth_sssd_debug_level }}
+ldap_id_use_start_tls = True
+ldap_tls_cacertdir = /etc/openldap/cacerts
+
 [sssd]
+debug_level = {{ linux_ad_auth_sssd_debug_level }}
 config_file_version = 2
 services = {{ linux_ad_auth_sssd_services | join(", ") }}
 domains = {{ linux_ad_auth_sssd_domain }}
 reconnection_retries = {{ linux_ad_auth_sssd_reconnection_retries }}
 
 [nss]
+debug_level = {{ linux_ad_auth_sssd_debug_level }}
+filter_groups = root
+filter_users = root
+entry_cache_timeout = 300
+entry_cache_nowait_percentage = 75
 reconnection_retries = {{ linux_ad_auth_sssd_reconnection_retries }}
 override_shell = {{ linux_ad_auth_sssd_override_shell }}
 override_homedir = {{ linux_ad_auth_sssd_override_homedir }}
 
 [pam]
+debug_level = {{ linux_ad_auth_sssd_debug_level }}
+offline_credentials_expiration = 2
+offline_failed_login_attempts = 3
+offline_failed_login_delay = 5
 reconnection_retries = {{ linux_ad_auth_sssd_reconnection_retries }}
 
 [pac]
+debug_level = {{ linux_ad_auth_sssd_debug_level }}
+
+[sudo]
+debug_level = {{ linux_ad_auth_sssd_debug_level }}
+sudo_timed = true
+sudo_threshold = 50
 
 [domain/{{ linux_ad_auth_sssd_domain }}]
 description = LDAP domain with AD servers
@@ -22,6 +43,10 @@ ad_domain = {{ linux_ad_auth_sssd_ad_domain }}
 ad_enable_gc = False
 ad_hostname = {{ ansible_facts.hostname }}
 ad_gpo_ignore_unreadable = {{ (linux_ad_auth_sssd_ad_gpo_ignore_unreadable) | ternary("True", "False") }}
+ad_gpo_access_control = enforcing
+ad_gpo_implicit_deny = True
+sudo_provider = ad
+ldap_sudo_search_base = ou=sudoers,dc=macsis,dc=mda,dc=mil
 id_provider = {{ linux_ad_auth_sssd_id_provider }}
 auth_provider = {{ linux_ad_auth_sssd_auth_provider }}
 access_provider = {{ linux_ad_auth_sssd_access_provider }}
@@ -45,4 +70,11 @@ ldap_id_mapping = {{ (linux_ad_auth_sssd_ldap_id_mapping) | ternary("True", "Fal
 ldap_access_filter = {{ linux_ad_auth_sssd_access_filter }}
 ldap_schema = {{ linux_ad_auth_sssd_ldap_schema }}
 enumerate = {{ (linux_ad_auth_sssd_enumerate) | ternary("True", "False") }}
+ldap_sasl_authid = {{ linux_ad_auth_host_netbios_name }}$
+ad_maximum_machine_account_password_age = 30
+case_sensitive = false
+full_name_format = %1$s@%2$s
+auto_private_groups = true
+ignore_group_members = true
+shell_fallback = /bin/sh
 debug_level = {{ linux_ad_auth_sssd_debug_level }}
