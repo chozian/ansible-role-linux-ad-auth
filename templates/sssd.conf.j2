@@ -23,11 +23,11 @@ override_shell = {{ linux_ad_auth_sssd_override_shell }}
 override_homedir = {{ linux_ad_auth_sssd_override_homedir }}
 
 [pam]
-debug_level = {{ linux_ad_auth_sssd_debug_level }}
 offline_credentials_expiration = 2
+debug_level = {{ linux_ad_auth_sssd_debug_level }}
 offline_failed_login_attempts = 3
-offline_failed_login_delay = 5
 reconnection_retries = {{ linux_ad_auth_sssd_reconnection_retries }}
+offline_failed_login_delay = 5
 
 [pac]
 debug_level = {{ linux_ad_auth_sssd_debug_level }}
