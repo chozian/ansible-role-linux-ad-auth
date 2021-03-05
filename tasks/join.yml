@@ -15,6 +15,7 @@
         responses:
           ":": "{{ linux_ad_auth_password }}"
       register: linux_ad_auth_join_realm_result
+      changed_when: linux_ad_auth_join_realm_result.rc == 0
       failed_when: >-
         linux_ad_auth_join_realm_result.rc != 0
         and "realm: Already joined to this domain"

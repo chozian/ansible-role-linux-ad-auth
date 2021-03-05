@@ -2,6 +2,46 @@
 # Main role tasks
 
 - block:
+
+    - name: Check for existence of multiple required strings in specific pamd configs, set 1
+      ansible.builtin.shell: |
+        FILES=("fingerprint-auth" "fingerprint-auth-ac" "password-auth" "password-auth-ac" "system-auth" "system-auth-ac")
+        STRINGS=("pam_unix.so broken_shadow" "pam_localuser.so" "pam_sss.so" "pam_krb5.so" "pam_oddjob_mkhomedir.so")
+        for file in "${FILES[@]}"
+        do
+            for string in "${STRINGS[@]}"
+            do
+                if grep -q -wF -e "$string" /etc/pam.d/"$file"; then
+                    true
+                else
+                    exit 1
+                fi
+            done
+        done
+      register: pamd_configs_set_1
+      changed_when: "pamd_configs_set_1.rc == 1"
+      failed_when: "pamd_configs_set_1.rc >= 2"
+
+    - name: Check for existence of multiple required strings in specific pamd configs, set 2
+      ansible.builtin.shell: |
+        FILES=("smartcard-auth" "smartcard-auth-ac")
+        STRINGS=("[success=ok ignore=2 default=die] pam_pkcs11.so nodebug wait_for_card" "pam_unix.so broken_shadow" "pam_localuser.so" "pam_sss.so"
+        "pam_krb5.so" "pam_oddjob_mkhomedir.so")
+        for file in "${FILES[@]}"
+        do
+            for string in "${STRINGS[@]}"
+            do
+                if grep -q -wF -e "$string" /etc/pam.d/"$file"; then
+                    true
+                else
+                    exit 1
+                fi
+            done
+        done
+      register: pamd_configs_set_2
+      changed_when: "pamd_configs_set_2.rc == 1"
+      failed_when: "pamd_configs_set_2.rc >= 2"
+
     - name: Configure autentication
       command: >-
         /usr/sbin/authconfig
@@ -11,6 +51,8 @@
         --enablelocauthorize
         --enablemkhomedir
         --update
+      when: pamd_configs_set_1.changed or
+            pamd_configs_set_2.changed
 
     - name: Setup kerberos config file
       template:
